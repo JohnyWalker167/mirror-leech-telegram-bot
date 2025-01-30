@@ -66,18 +66,18 @@ class TelegramUploader:
         self._error = ""
 
 
-   async def get_custom_thumb(self, thumb):
-    photo_dir = await download_image_url(thumb)
+    async def get_custom_thumb(self, thumb):
+        photo_dir = await download_image_url(thumb)
 
-    if await aiopath.exists(photo_dir):
-        path = "Thumbnails"
-        if not await aiopath.isdir(path):
-            await mkdir(path)
-        des_dir = ospath.join(path, f'{time()}.jpg')
-        await sync_to_async(Image.open(photo_dir).convert("RGB").save, des_dir, "JPEG")
-        await remove(photo_dir)
-        return des_dir
-    return None
+        if await aiopath.exists(photo_dir):
+            path = "Thumbnails"
+            if not await aiopath.isdir(path):
+                await mkdir(path)
+            des_dir = ospath.join(path, f'{time()}.jpg')
+            await sync_to_async(Image.open(photo_dir).convert("RGB").save, des_dir, "JPEG")
+            await remove(photo_dir)
+            return des_dir
+        return None
 
     async def _upload_progress(self, current, _):
         if self._listener.is_cancelled:
