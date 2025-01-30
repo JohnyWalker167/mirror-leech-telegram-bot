@@ -1,3 +1,4 @@
+import os
 from PIL import Image
 from aiofiles.os import remove, path as aiopath, makedirs
 from asyncio import (
@@ -728,3 +729,104 @@ class FFMpeg:
             start_time += lpd - 3
             i += 1
         return True
+
+    async def merge_videos(self, folder_path, output_path):
+        self.clear()
+
+        self._total_time = 0
+
+        # Collect all video files in the folder
+        mkv_files = []
+        mp4_file = []
+        srt_file = []
+        for root, _, files in os.walk(folder_path):
+            for f in files:
+                if f.endswith(('.mkv')):
+                    mkv_files.append(os.path.join(root, f)) 
+                if f.endswith(('.mp4')):
+                    mp4_file.append(os.path.join(root, f)) 
+                if f.endswith(('.srt')):
+                    srt_file.append(os.path.join(root, f)) 
+
+        # Ensure there are video files to merge
+        if not mkv_files or mp4_file:
+            LOGGER.error(f"No video files found in the folder: {folder_path}")
+            return False
+        
+        mkv_files.sort()
+        
+        # Create a temporary text file for ffmpeg to read the list of video files
+        with open(os.path.join(folder_path, 'filelist.txt'), 'w') as filelist:
+            for video in mkv_files:
+                filelist.write(f"file '{video}'\n")
+        if mkv_files:
+            # Construct the ffmpeg command to concatenate videos
+            cmd = [
+                "ffmpeg",
+                "-hide_banner",
+                "-loglevel", "error",
+                "-f", "concat",
+                "-safe", "0",
+                "-i", os.path.join(folder_path, 'filelist.txt'),
+                "-c", "copy",
+                '-map', '0:v',  
+                '-map', '0:a',
+                '-map', '0:s',
+                output_path
+            ]
+        if mp4_file:
+            cmd = [
+                "ffmpeg",
+                "-hide_banner",
+                "-loglevel", "error",
+                '-i', mp4_file[0],
+                '-i', srt_file[0],  # Include the SRT subtitle file
+                '-c:v', 'copy',  
+                '-c:a', 'copy',  
+                '-c:s', 'mov_text',  
+                '-map', '0:v',  
+                '-map', '0:a', 
+                '-map', '1',  
+                output_path
+            ]
+
+        if self._listener.is_cancelled:
+            return False
+        
+        # Execute the ffmpeg command
+        self._listener.subproc = await create_subprocess_exec(
+            *cmd,
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+        
+        await self._ffmpeg_progress()
+        _, stderr = await self._listener.subproc.communicate()
+        code = self._listener.subproc.returncode
+        
+        # Clean up the temporary file list
+        #os.remove(os.path.join(folder_path, 'filelist.txt'))
+        for file in mkv_files:
+            try:
+                os.remove(file)  # Deletes the file
+            except Exception as e:
+                LOGGER.info(f"Error deleting {file}: {e}")
+                
+        if mp4_file:
+            os.remove(mp4_file[0])
+ 
+        if self._listener.is_cancelled:
+            return False
+        if code == 0:
+            return output_path
+        if code == -9:
+            self._listener.is_cancelled = True
+            return False
+        
+        try:
+            stderr = stderr.decode().strip()
+        except Exception:
+            stderr = "Unable to decode the error!"
+        
+        LOGGER.error(f"{stderr}. Something went wrong while merging videos. Folder: {folder_path}")
+        return False

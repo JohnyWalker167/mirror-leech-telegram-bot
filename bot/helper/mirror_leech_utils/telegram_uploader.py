@@ -4,13 +4,15 @@ from asyncio import sleep
 from logging import getLogger
 from natsort import natsorted
 from os import walk, path as ospath
+from aiofiles import open as aiopen 
 from time import time
 from re import match as re_match, sub as re_sub
-from pyrogram.errors import FloodWait, RPCError, FloodPremiumWait, BadRequest
+from pyrogram.errors import FloodWait, RPCError, BadRequest
 from aiofiles.os import (
     remove,
     path as aiopath,
     rename,
+    mkdir
 )
 from pyrogram.types import (
     InputMediaVideo,
@@ -37,8 +39,22 @@ from ..ext_utils.media_utils import (
     get_audio_thumbnail,
     get_multiple_frames_thumbnail,
 )
+from bot.helper.custom_utils import get_by_name, extract_movie_info, download_image_url
 
 LOGGER = getLogger(__name__)
+
+async def get_custom_thumb(self, thumb):
+    photo_dir = await download_image_url(thumb)
+
+    if await aiopath.exists(photo_dir):
+        path = "Thumbnails"
+        if not await aiopath.isdir(path):
+            await mkdir(path)
+        des_dir = ospath.join(path, f'{time()}.jpg')
+        await sync_to_async(Image.open(photo_dir).convert("RGB").save, des_dir, "JPEG")
+        await remove(photo_dir)
+        return des_dir
+    return None
 
 
 class TelegramUploader:
@@ -378,6 +394,10 @@ class TelegramUploader:
                         self._listener.thumbnail_layout,
                         self._listener.screen_shots,
                     )
+                if tmdb_poster_url and thumb is None:
+                     thumb =  await self.get_custom_thumb(tmdb_poster_url)
+                     LOGGER.info("Got the poster")
+
                 if thumb is None:
                     thumb = await get_video_thumbnail(self._up_path, duration)
                 if thumb is not None and thumb != "none":
@@ -460,7 +480,7 @@ class TelegramUploader:
                 and await aiopath.exists(thumb)
             ):
                 await remove(thumb)
-        except (FloodWait, FloodPremiumWait) as f:
+        except (FloodWait) as f:
             LOGGER.warning(str(f))
             await sleep(f.value * 1.3)
             if (
