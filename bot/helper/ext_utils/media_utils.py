@@ -754,7 +754,6 @@ class FFMpeg:
         # Ensure there are video files to merge
         if mkv_files or mp4_file:
             LOGGER.info(f"video files found in the folder: {folder_path}")
-            return False
 
         cmd = []
                         
