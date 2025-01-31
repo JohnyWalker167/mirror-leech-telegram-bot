@@ -745,10 +745,10 @@ class FFMpeg:
                     mkv_files.append(os.path.join(root, f))
                     LOGGER.info(f"Found MKV file: {os.path.join(root, f)}")
                 elif f.endswith('.mp4'):
-                    mp4_file.append(os.path.join(folder_path, f))
+                    mp4_file = os.path.join(folder_path, f)
                     LOGGER.info(f"Found MP4 file: {os.path.join(root, f)}")
                 elif f.endswith('.srt'):
-                    srt_file.append(os.path.join(folder_path, f))
+                    srt_file = os.path.join(folder_path, f)
                     LOGGER.info(f"Found SRT file: {os.path.join(root, f)}")
 
         # Ensure there are video files to merge
