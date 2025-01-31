@@ -780,7 +780,7 @@ class FFMpeg:
                 "-hide_banner",
                 "-loglevel", "error",
                 '-i', mp4_file[0],
-                '-i', srt_file[0],  
+                '-i', srt_file[-1],  
                 '-c:v', 'copy',  
                 '-c:a', 'copy',  
                 '-c:s', 'mov_text',  
