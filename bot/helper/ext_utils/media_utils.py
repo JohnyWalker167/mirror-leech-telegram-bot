@@ -825,7 +825,7 @@ class FFMpeg:
                 except Exception as e:
                     LOGGER.info(f"Error deleting {file}: {e}")
                 
-        if mp4_files:
+        if mp4_file:
             os.remove(mp4_file)
  
         if self._listener.is_cancelled:
