@@ -787,7 +787,7 @@ class FFMpeg:
                 '-map', '0:v',  
                 '-map', '0:a', 
                 '-map', '1',  
-                output_path
+                f'{output_path}.mp4'
             ]
             LOGGER.info(f"{cmd}")
             
