@@ -744,22 +744,22 @@ class FFMpeg:
                 if f.endswith(('.mkv')):
                     mkv_files.append(os.path.join(root, f)) 
                 if f.endswith(('.mp4')):
-                    mp4_file = os.path.join(folder_path, f)
+                    mp4_file = os.path.join(root, f)
                 if f.endswith(('.srt')):
-                    srt_file.append(os.path.join(folder_path, f)) 
+                    srt_file.append(os.path.join(root, f)) 
 
         # Ensure there are video files to merge
         if not mkv_files and mp4_file:
             LOGGER.error(f"No video files found in the folder: {folder_path}")
-            return False
-        
-        mkv_files.sort()
-        
-        # Create a temporary text file for ffmpeg to read the list of video files
-        with open(os.path.join(folder_path, 'filelist.txt'), 'w') as filelist:
-            for video in mkv_files:
-                filelist.write(f"file '{video}'\n")
+            return False        
+
         if mkv_files:
+            mkv_files.sort()
+                    # Create a temporary text file for ffmpeg to read the list of video files
+            with open(os.path.join(folder_path, 'filelist.txt'), 'w') as filelist:
+                for video in mkv_files:
+                    filelist.write(f"file '{video}'\n")
+            
             # Construct the ffmpeg command to concatenate videos
             cmd = [
                 "ffmpeg",
@@ -789,6 +789,8 @@ class FFMpeg:
                 '-map', '1',  
                 output_path
             ]
+            print(f"{mp4_file}")
+            print(f"{srt_file}")     
 
         if self._listener.is_cancelled:
             return False
@@ -813,7 +815,7 @@ class FFMpeg:
                 LOGGER.info(f"Error deleting {file}: {e}")
                 
         if mp4_file:
-            os.remove(mp4_file[0])
+            os.remove(mp4_file)
  
         if self._listener.is_cancelled:
             return False
