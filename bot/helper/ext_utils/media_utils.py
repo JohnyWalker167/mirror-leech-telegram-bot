@@ -737,22 +737,22 @@ class FFMpeg:
 
         # Collect all video files in the folder
         mkv_files = []
-        mp4_files = []
-        srt_files = []
+        mp4_file = None
+        srt_file = None
         for root, _, files in os.walk(folder_path):
             for f in files:
                 if f.endswith('.mkv'):
                     mkv_files.append(os.path.join(root, f))
                     LOGGER.info(f"Found MKV file: {os.path.join(root, f)}")
                 elif f.endswith('.mp4'):
-                    mp4_files.append(os.path.join(folder_path, f))
+                    mp4_file.append(os.path.join(folder_path, f))
                     LOGGER.info(f"Found MP4 file: {os.path.join(root, f)}")
                 elif f.endswith('.srt'):
-                    srt_files.append(os.path.join(folder_path, f))
+                    srt_file.append(os.path.join(folder_path, f))
                     LOGGER.info(f"Found SRT file: {os.path.join(root, f)}")
 
         # Ensure there are video files to merge
-        if mkv_files or mp4_files:
+        if mkv_files or mp4_file:
             LOGGER.error(f"video files found in the folder: {folder_path}")
             return False
         
@@ -780,19 +780,19 @@ class FFMpeg:
                 output_path
             ]
 
-        elif mp4_files and srt_files:
+        elif mp4_file:
             cmd = [
                 "ffmpeg",
                 "-hide_banner",
                 "-loglevel", "error",
-                '-i', mp4_files[0],
-                '-i', srt_files[0],  # Include the SRT subtitle file
-                '-c:v', 'copy',  
-                '-c:a', 'copy',  
-                '-c:s', 'mov_text',  
-                '-map', '0:v',  
-                '-map', '0:a', 
-                '-map', '1',  
+                "-i", mp4_file,
+                "-i", srt_file,
+                "-c:v", "copy",  
+                "-c:a", "copy",  
+                "-c:s", "mov_text",  
+                '-map', '0:v', 
+                '-map', '0:a',  
+                '-map', '1',    
                 output_path
             ]
 
