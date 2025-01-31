@@ -749,7 +749,7 @@ class FFMpeg:
                     srt_file.append(os.path.join(root, f)) 
 
         # Ensure there are video files to merge
-        if not mkv_files and mp4_file:
+        if not mkv_files and not mp4_file:
             LOGGER.error(f"No video files found in the folder: {folder_path}")
             return False
         if mkv_files:
