@@ -737,16 +737,16 @@ class FFMpeg:
 
         # Collect all video files in the folder
         mkv_files = []
-        mp4_file = []
-        srt_file = []
+        mp4_file = None
+        srt_file = None 
         for root, _, files in os.walk(folder_path):
             for f in files:
                 if f.endswith(('.mkv')):
                     mkv_files.append(os.path.join(root, f)) 
                 if f.endswith(('.mp4')):
-                    mp4_file.append(os.path.join(root, f)) 
+                    mp4_file = os.path.join(folder_path, f)
                 if f.endswith(('.srt')):
-                    srt_file.append(os.path.join(root, f)) 
+                    srt_file.append(os.path.join(folder_path, f)) 
 
         # Ensure there are video files to merge
         if not mkv_files and mp4_file:
@@ -779,8 +779,8 @@ class FFMpeg:
                 "ffmpeg",
                 "-hide_banner",
                 "-loglevel", "error",
-                '-i', mp4_file[0],
-                '-i', srt_file[0],  # Include the SRT subtitle file
+                '-i', mp4_file,
+                '-i', srt_file,  # Include the SRT subtitle file
                 '-c:v', 'copy',  
                 '-c:a', 'copy',  
                 '-c:s', 'mov_text',  
