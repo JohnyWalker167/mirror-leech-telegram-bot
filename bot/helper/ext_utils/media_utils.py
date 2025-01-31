@@ -826,7 +826,7 @@ class FFMpeg:
                     LOGGER.info(f"Error deleting {file}: {e}")
                 
         if mp4_files:
-            os.remove(mp4_files[0])
+            os.remove(mp4_file)
  
         if self._listener.is_cancelled:
             return False
