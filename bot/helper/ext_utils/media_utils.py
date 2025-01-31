@@ -737,26 +737,21 @@ class FFMpeg:
 
         # Collect all video files in the folder
         mkv_files = []
-        mp4_file = None
-        srt_file = None
+        mp4_file = []
+        srt_file = []
         for root, _, files in os.walk(folder_path):
             for f in files:
-                if f.endswith('.mkv'):
-                    mkv_files.append(os.path.join(root, f))
-                    LOGGER.info(f"Found MKV file: {os.path.join(root, f)}")
-                elif f.endswith('.mp4'):
-                    mp4_file = f
-                    LOGGER.info(f"Found MP4 file: {os.path.join(root, f)}")
-                elif f.endswith('.srt'):
-                    srt_file = f
-                    LOGGER.info(f"Found SRT file: {os.path.join(root, f)}")
+                if f.endswith(('.mkv')):
+                    mkv_files.append(os.path.join(root, f)) 
+                if f.endswith(('.mp4')):
+                    mp4_file.append(os.path.join(root, f)) 
+                if f.endswith(('.srt')):
+                    srt_file.append(os.path.join(root, f)) 
 
         # Ensure there are video files to merge
-        if mkv_files or mp4_file:
-            LOGGER.info(f"video files found in the folder: {folder_path}")
-
-        cmd = []
-                        
+        if not mkv_files and mp4_file:
+            LOGGER.error(f"No video files found in the folder: {folder_path}")
+            return False
         if mkv_files:
             mkv_files.sort()
             # Create a temporary text file for ffmpeg to read the list of video files
@@ -779,14 +774,13 @@ class FFMpeg:
                 output_path
             ]
 
-        elif mp4_file:
-            LOGGER.info("Executed")
+        if mp4_file:
             cmd = [
                 "ffmpeg",
                 "-hide_banner",
                 "-loglevel", "error",
-                "-i", os.path.join(folder_path, f'{mp4_file}'),
-                "-i", os.path.join(folder_path, f'{srt_file}'),
+                '-i', mp4_file[0],
+                '-i', srt_file[0],  
                 '-c:v', 'copy',  
                 '-c:a', 'copy',  
                 '-c:s', 'mov_text',  
@@ -795,37 +789,33 @@ class FFMpeg:
                 '-map', '1',  
                 output_path
             ]
-
-        if not cmd:
-            LOGGER.error("No valid ffmpeg command constructed.")
-            return False
-
+            LOGGER.info(f"{cmd}")
+            
         if self._listener.is_cancelled:
             return False
-
+        
         # Execute the ffmpeg command
         self._listener.subproc = await create_subprocess_exec(
             *cmd,
             stdout=PIPE,
             stderr=PIPE,
         )
-
+        
         await self._ffmpeg_progress()
         _, stderr = await self._listener.subproc.communicate()
         code = self._listener.subproc.returncode
-
+        
         # Clean up the temporary file list
         #os.remove(os.path.join(folder_path, 'filelist.txt'))
-        if mkv_files:
-            for file in mkv_files:
-                try:
-                    os.remove(file)  # Deletes the file
-                except Exception as e:
-                    LOGGER.info(f"Error deleting {file}: {e}")
+        for file in mkv_files:
+            try:
+                os.remove(file)  # Deletes the file
+            except Exception as e:
+                LOGGER.info(f"Error deleting {file}: {e}")
                 
         if mp4_file:
-            os.remove((folder_path, f'{mp4_file}'))
-
+            os.remove(mp4_file[0])
+ 
         if self._listener.is_cancelled:
             return False
         if code == 0:
@@ -833,11 +823,11 @@ class FFMpeg:
         if code == -9:
             self._listener.is_cancelled = True
             return False
-
+        
         try:
             stderr = stderr.decode().strip()
         except Exception:
             stderr = "Unable to decode the error!"
-
+        
         LOGGER.error(f"{stderr}. Something went wrong while merging videos. Folder: {folder_path}")
         return False
