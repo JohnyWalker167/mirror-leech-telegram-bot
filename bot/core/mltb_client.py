@@ -42,7 +42,7 @@ class TgClient:
                     Config.TELEGRAM_HASH,
                     session_string=Config.USER_SESSION_STRING,
                     parse_mode=enums.ParseMode.HTML,
-                    sleep_threshold=60
+                    no_updates=True
                 )
                 await cls.user.start()
                 cls.IS_PREMIUM_USER = cls.user.me.is_premium
