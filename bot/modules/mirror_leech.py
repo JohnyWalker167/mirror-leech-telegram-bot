@@ -340,8 +340,9 @@ class Mirror(TaskListener):
                         return
 
         if file_ is not None:
+            custom_name = f"{reply_to.caption}
             await TelegramDownloadHelper(self).add_download(
-                reply_to, f"{path}/", session
+                reply_to, f"{path}/", custom_name, session
             )
         elif isinstance(self.link, dict):
             await add_direct_download(self, path)
