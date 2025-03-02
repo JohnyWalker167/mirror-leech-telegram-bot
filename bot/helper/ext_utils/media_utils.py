@@ -755,9 +755,10 @@ class FFMpeg:
         if mkv_files:
             mkv_files.sort()
             # Create a temporary text file for ffmpeg to read the list of video files
-            with open(os.path.join(folder_path, 'filelist.txt'), 'w') as filelist:
+            with open(os.path.join(folder_path, 'filelist.txt'), 'w', encoding='utf-8') as filelist:
                 for video in mkv_files:
-                    filelist.write(f"file '{video}'\n")
+                    safe_video = video.replace("'", "'\\''")  # Escape single quotes for FFmpeg
+                    filelist.write(f"file '{safe_video}'\n")
 
             # Construct the ffmpeg command to concatenate videos
             cmd = [
@@ -775,6 +776,7 @@ class FFMpeg:
             ]
 
         if mp4_file:
+
             cmd = [
                 "ffmpeg",
                 "-hide_banner",
