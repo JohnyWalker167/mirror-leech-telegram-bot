@@ -439,6 +439,13 @@ async def edit_user_settings(client, query):
             leech_dest = Config.LEECH_DUMP_CHAT
         else:
             leech_dest = "None"
+        buttons.data_button(
+            "User Dump", f"userset {user_id} menu USER_DUMP"
+        )
+        if user_dict.get("USER_DUMP", False):
+            udump = user_dict["USER_DUMP"]
+        else:
+            udump = "None"
         buttons.data_button("Leech Prefix", f"userset {user_id} leech_prefix")
         if user_dict.get("lprefix", False):
             lprefix = user_dict["lprefix"]
@@ -538,6 +545,7 @@ Equal Splits is <b>{equal_splits}</b>
 Media Group is <b>{media_group}</b>
 Leech Prefix is <code>{escape(lprefix)}</code>
 Leech Destination is <code>{leech_dest}</code>
+User dump <code>{udump}</code>
 Leech by <b>{leech_method}</b> session
 Mixed Leech is <b>{mixed_leech}</b>
 Thumbnail Layout is <b>{thumb_layout}</b>

@@ -1,3 +1,4 @@
+import contextlib
 from PIL import Image
 from aioshutil import rmtree
 from asyncio import sleep
@@ -64,6 +65,7 @@ class TelegramUploader:
         self._sent_msg = None
         self._user_session = self._listener.user_transmission
         self._error = ""
+        self._user_dump = ""
 
 
     async def get_custom_thumb(self, thumb):
@@ -100,6 +102,7 @@ class TelegramUploader:
             if "lprefix" not in self._listener.user_dict
             else ""
         )
+        self._user_dump = self._listener.user_dict.get("USER_DUMP")
         if self._thumb != "none" and not await aiopath.exists(self._thumb):
             self._thumb = None
 
@@ -455,6 +458,8 @@ class TelegramUploader:
                     progress=self._upload_progress,
                 )
 
+            cpy_msg = await self._copy_message()
+            
             if (
                 not self._listener.is_cancelled
                 and self._media_group
@@ -506,6 +511,32 @@ class TelegramUploader:
                 LOGGER.error(f"Retrying As Document. Path: {self._up_path}")
                 return await self._upload_file(cap_mono, file, o_path, True)
             raise err
+        
+    async def _copy_message(self):
+        await sleep(1)
+
+        async def _copy(target, retries=3):
+            cpy_msg = None
+            for attempt in range(retries):
+                try:
+                    msg = await TgClient.bot.get_messages(
+                        self._sent_msg.chat.id,
+                        self._sent_msg.id,
+                    )
+                    if msg and msg.document.mime_type.startswith("video/"):
+                        cpy_msg = await msg.copy(target)
+                    return cpy_msg
+                except Exception as e:
+                    LOGGER.error(f"Attempt {attempt + 1} failed: {e} {msg.id}")
+                    if attempt < retries - 1:
+                        await sleep(0.5)
+            LOGGER.error(f"Failed to copy message after {retries} attempts")
+            return cpy_msg
+        
+        if self._user_dump:
+            with contextlib.suppress(Exception):
+                cpy_msg = await _copy(int(self._user_dump))
+                return cpy_msg
 
     @property
     def speed(self):
