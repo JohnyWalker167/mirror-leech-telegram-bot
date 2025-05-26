@@ -439,9 +439,7 @@ async def edit_user_settings(client, query):
             leech_dest = Config.LEECH_DUMP_CHAT
         else:
             leech_dest = "None"
-        buttons.data_button(
-            "User Dump", f"userset {user_id} menu USER_DUMP"
-        )
+        buttons.data_button("User Dump", f"userset {user_id} menu USER_DUMP")
         if user_dict.get("USER_DUMP", False):
             udump = user_dict["USER_DUMP"]
         else:
@@ -778,6 +776,25 @@ Here I will explain how to use mltb.* which is reference to files you want to wo
             buttons.build_menu(1),
         )
         pfunc = partial(set_option, pre_event=query, option="leech_dest")
+        await event_handler(client, query, pfunc)
+    elif data[2] == "USER_DUMP":
+        await query.answer()
+        buttons = ButtonMaker()
+        if (
+            user_dict.get("USER_DUMP", False)
+            or "USER_DUMP" not in user_dict
+        ):
+            buttons.data_button(
+                "Reset Leech Destination", f"userset {user_id} leech_dest"
+            )
+        buttons.data_button("Back", f"userset {user_id} leech")
+        buttons.data_button("Close", f"userset {user_id} close")
+        await edit_message(
+            message,
+            "Send USER DUMP ID/USERNAME/PM. Timeout: 60 sec",
+            buttons.build_menu(1),
+        )
+        pfunc = partial(set_option, pre_event=query, option="USER_DUMP")
         await event_handler(client, query, pfunc)
     elif data[2] == "tlayout":
         await query.answer()
