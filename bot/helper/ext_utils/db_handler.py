@@ -112,6 +112,8 @@ class DbManager:
             del data["rclone_config"]
         if data.get("token_pickle"):
             del data["token_pickle"]
+        if data.get("USER_DUMP"):
+            del data["USER_DUMP"]
         await self.db.users.replace_one({"_id": user_id}, data, upsert=True)
 
     async def update_user_doc(self, user_id, key, path=""):
