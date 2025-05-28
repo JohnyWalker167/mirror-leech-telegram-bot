@@ -446,7 +446,7 @@ async def edit_user_settings(client, query):
             leech_dest = Config.LEECH_DUMP_CHAT
         else:
             leech_dest = "None"
-        buttons.data_button("User Dump", f"userset {user_id} menu USER_DUMP")
+        buttons.data_button("User Dump", f"userset {user_id} USER_DUMP")
         if user_dict.get("USER_DUMP", False):
             udump = user_dict["USER_DUMP"]
         else:
