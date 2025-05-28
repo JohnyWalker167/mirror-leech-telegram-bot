@@ -325,6 +325,13 @@ async def set_option(_, message, pre_event, option):
             await send_message(message, "It must be list of lists!")
             await update_user_settings(pre_event)
             return
+    elif option == "USER_DUMP":
+        # Save the user dump value directly
+        update_user_ldata(user_id, "USER_DUMP", value)
+        await delete_message(message)
+        await update_user_settings(pre_event)
+        await database.update_user_doc(user_id, "USER_DUMP", value)
+        return
     update_user_ldata(user_id, option, value)
     await delete_message(message)
     await update_user_settings(pre_event)
