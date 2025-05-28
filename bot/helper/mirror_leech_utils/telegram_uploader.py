@@ -102,7 +102,7 @@ class TelegramUploader:
             if "lprefix" not in self._listener.user_dict
             else ""
         )
-        self._user_dump = self._listener.user_dict.get("USER_DUMP")
+        self._user_dump = self._listener.user_dict.get("user_dump_chat")
         if self._thumb != "none" and not await aiopath.exists(self._thumb):
             self._thumb = None
 

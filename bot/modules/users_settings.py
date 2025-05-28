@@ -325,13 +325,6 @@ async def set_option(_, message, pre_event, option):
             await send_message(message, "It must be list of lists!")
             await update_user_settings(pre_event)
             return
-    elif option == "USER_DUMP":
-        # Save the user dump value directly
-        update_user_ldata(user_id, "USER_DUMP", value)
-        await delete_message(message)
-        await update_user_settings(pre_event)
-        await database.update_user_doc(user_id, "USER_DUMP", value)
-        return
     update_user_ldata(user_id, option, value)
     await delete_message(message)
     await update_user_settings(pre_event)
@@ -446,11 +439,13 @@ async def edit_user_settings(client, query):
             leech_dest = Config.LEECH_DUMP_CHAT
         else:
             leech_dest = "None"
-        buttons.data_button("User Dump", f"userset {user_id} USER_DUMP")
-        if user_dict.get("USER_DUMP", False):
-            udump = user_dict["USER_DUMP"]
+        buttons.data_button("User Dump Chat", f"userset {user_id} user_dump_chat")
+        if user_dict.get("user_dump_chat", False):
+            user_dump_chat = user_dict["user_dump_chat"]
+        elif "user_dump_chat" not in user_dict and getattr(Config, "USER_DUMP_CHAT", None):
+            user_dump_chat = Config.USER_DUMP_CHAT
         else:
-            udump = "None"
+            user_dump_chat = "None"
         buttons.data_button("Leech Prefix", f"userset {user_id} leech_prefix")
         if user_dict.get("lprefix", False):
             lprefix = user_dict["lprefix"]
@@ -550,7 +545,7 @@ Equal Splits is <b>{equal_splits}</b>
 Media Group is <b>{media_group}</b>
 Leech Prefix is <code>{escape(lprefix)}</code>
 Leech Destination is <code>{leech_dest}</code>
-User dump <code>{udump}</code>
+User Dump Chat is <code>{user_dump_chat}</code>
 Leech by <b>{leech_method}</b> session
 Mixed Leech is <b>{mixed_leech}</b>
 Thumbnail Layout is <b>{thumb_layout}</b>
@@ -784,24 +779,19 @@ Here I will explain how to use mltb.* which is reference to files you want to wo
         )
         pfunc = partial(set_option, pre_event=query, option="leech_dest")
         await event_handler(client, query, pfunc)
-    elif data[2] == "USER_DUMP":
+    elif data[2] == "user_dump_chat":
         await query.answer()
         buttons = ButtonMaker()
-        if (
-            user_dict.get("USER_DUMP", False)
-            or "USER_DUMP" not in user_dict
-        ):
-            buttons.data_button(
-                "Reset Leech Destination", f"userset {user_id} leech_dest"
-            )
+        if user_dict.get("user_dump_chat", False):
+            buttons.data_button("Reset User Dump Chat", f"userset {user_id} user_dump_chat")
         buttons.data_button("Back", f"userset {user_id} leech")
         buttons.data_button("Close", f"userset {user_id} close")
         await edit_message(
             message,
-            "Send USER DUMP ID/USERNAME/PM. Timeout: 60 sec",
+            "Send User Dump Chat ID/USERNAME/PM. Timeout: 60 sec",
             buttons.build_menu(1),
         )
-        pfunc = partial(set_option, pre_event=query, option="USER_DUMP")
+        pfunc = partial(set_option, pre_event=query, option="user_dump_chat")
         await event_handler(client, query, pfunc)
     elif data[2] == "tlayout":
         await query.answer()
