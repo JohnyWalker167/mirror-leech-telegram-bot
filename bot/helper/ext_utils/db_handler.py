@@ -5,7 +5,7 @@ from pymongo import AsyncMongoClient
 from pymongo.server_api import ServerApi
 from pymongo.errors import PyMongoError
 
-from ... import LOGGER, user_data, rss_dict, qbit_options
+from ... import LOGGER, user_data, rss_dict
 from ...core.telegram_manager import TgClient
 from ...core.config_manager import Config
 
@@ -67,20 +67,6 @@ class DbManager:
             {"_id": TgClient.ID}, {"$set": {key: value}}, upsert=True
         )
 
-    async def update_qbittorrent(self, key, value):
-        if self._return:
-            return
-        await self.db.settings.qbittorrent.update_one(
-            {"_id": TgClient.ID}, {"$set": {key: value}}, upsert=True
-        )
-
-    async def save_qbit_settings(self):
-        if self._return:
-            return
-        await self.db.settings.qbittorrent.update_one(
-            {"_id": TgClient.ID}, {"$set": qbit_options}, upsert=True
-        )
-
     async def update_private_file(self, path):
         if self._return:
             return
@@ -97,15 +83,6 @@ class DbManager:
             await self.db.settings.files.update_one(
                 {"_id": TgClient.ID}, {"$unset": {db_path: ""}}, upsert=True
             )
-
-    async def update_nzb_config(self):
-        if self._return:
-            return
-        async with aiopen("sabnzbd/SABnzbd.ini", "rb+") as pf:
-            nzb_conf = await pf.read()
-        await self.db.settings.nzb.replace_one(
-            {"_id": TgClient.ID}, {"SABnzbd__ini": nzb_conf}, upsert=True
-        )
 
     async def update_user_data(self, user_id):
         if self._return:
