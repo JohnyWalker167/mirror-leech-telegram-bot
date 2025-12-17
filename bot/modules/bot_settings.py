@@ -49,7 +49,6 @@ from ..helper.telegram_helper.message_utils import (
     delete_message,
 )
 from .rss import add_job
-from .search import initiate_search_tools
 
 start = 0
 state = "view"
@@ -230,9 +229,7 @@ async def edit_variable(_, message, pre_message, key):
     await update_buttons(pre_message, "var")
     await delete_message(message)
     await database.update_config({key: value})
-    if key in ["SEARCH_PLUGINS", "SEARCH_API_LINK"]:
-        await initiate_search_tools()
-    elif key in ["QUEUE_ALL", "QUEUE_DOWNLOAD", "QUEUE_UPLOAD"]:
+    if key in ["QUEUE_ALL", "QUEUE_DOWNLOAD", "QUEUE_UPLOAD"]:
         await start_from_queued()
     elif key in [
         "RCLONE_SERVE_URL",
@@ -604,5 +601,5 @@ async def load_config():
         await database.update_config(config_dict)
     else:
         await database.disconnect()
-    await gather(initiate_search_tools(), start_from_queued(), rclone_serve_booter())
+    await gather(start_from_queued(), rclone_serve_booter())
     add_job()
