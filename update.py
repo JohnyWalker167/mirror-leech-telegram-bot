@@ -78,7 +78,7 @@ if DATABASE_URL := config_file.get("DATABASE_URL", "").strip():
 
 UPSTREAM_REPO = config_file.get("UPSTREAM_REPO", "").strip()
 
-UPSTREAM_BRANCH = config_file.get("UPSTREAM_BRANCH", "").strip() or "remove-qbit-sabnzbd-16396810414628316160"
+UPSTREAM_BRANCH = config_file.get("UPSTREAM_BRANCH", "").strip() or "master"
 
 if UPSTREAM_REPO:
     if path.exists(".git"):
