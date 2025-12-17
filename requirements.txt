@@ -4,7 +4,6 @@ aioshutil
 anytree
 apscheduler
 aioaria2
-aioqbt
 cloudscraper
 dnspython
 fastapi

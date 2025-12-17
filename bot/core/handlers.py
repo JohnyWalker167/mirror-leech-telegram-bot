@@ -147,22 +147,8 @@ def add_handlers():
     )
     TgClient.bot.add_handler(
         MessageHandler(
-            qb_mirror,
-            filters=command(BotCommands.QbMirrorCommand, case_sensitive=True)
-            & CustomFilters.authorized,
-        )
-    )
-    TgClient.bot.add_handler(
-        MessageHandler(
             jd_mirror,
             filters=command(BotCommands.JdMirrorCommand, case_sensitive=True)
-            & CustomFilters.authorized,
-        )
-    )
-    TgClient.bot.add_handler(
-        MessageHandler(
-            nzb_mirror,
-            filters=command(BotCommands.NzbMirrorCommand, case_sensitive=True)
             & CustomFilters.authorized,
         )
     )
@@ -175,22 +161,8 @@ def add_handlers():
     )
     TgClient.bot.add_handler(
         MessageHandler(
-            qb_leech,
-            filters=command(BotCommands.QbLeechCommand, case_sensitive=True)
-            & CustomFilters.authorized,
-        )
-    )
-    TgClient.bot.add_handler(
-        MessageHandler(
             jd_leech,
             filters=command(BotCommands.JdLeechCommand, case_sensitive=True)
-            & CustomFilters.authorized,
-        )
-    )
-    TgClient.bot.add_handler(
-        MessageHandler(
-            nzb_leech,
-            filters=command(BotCommands.NzbLeechCommand, case_sensitive=True)
             & CustomFilters.authorized,
         )
     )
@@ -273,16 +245,6 @@ def add_handlers():
     )
     TgClient.bot.add_handler(
         MessageHandler(
-            torrent_search,
-            filters=command(BotCommands.SearchCommand, case_sensitive=True)
-            & CustomFilters.authorized,
-        )
-    )
-    TgClient.bot.add_handler(
-        CallbackQueryHandler(torrent_search_update, filters=regex("^torser"))
-    )
-    TgClient.bot.add_handler(
-        MessageHandler(
             get_users_settings,
             filters=command(BotCommands.UsersCommand, case_sensitive=True)
             & CustomFilters.sudo,
@@ -309,13 +271,6 @@ def add_handlers():
         MessageHandler(
             ytdl_leech,
             filters=command(BotCommands.YtdlLeechCommand, case_sensitive=True)
-            & CustomFilters.authorized,
-        )
-    )
-    TgClient.bot.add_handler(
-        MessageHandler(
-            hydra_search,
-            filters=command(BotCommands.NzbSearchCommand, case_sensitive=True)
             & CustomFilters.authorized,
         )
     )
