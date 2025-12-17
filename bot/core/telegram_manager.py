@@ -46,7 +46,6 @@ class TgClient:
                     Config.TELEGRAM_HASH,
                     proxy=Config.TG_PROXY,
                     session_string=Config.USER_SESSION_STRING,
-                    workdir="/app",
                     parse_mode=enums.ParseMode.HTML,
                     sleep_threshold=60,
                     max_concurrent_transmissions=10,
