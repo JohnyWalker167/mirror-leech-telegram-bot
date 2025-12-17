@@ -4,7 +4,7 @@ from aiofiles.os import path as aiopath, remove
 from asyncio import gather, create_subprocess_exec
 from os import execl as osexecl
 
-from .. import intervals, scheduler, sabnzbd_client, LOGGER
+from .. import intervals, scheduler, LOGGER
 from ..helper.ext_utils.bot_utils import new_task
 from ..helper.telegram_helper.message_utils import (
     send_message,
@@ -95,21 +95,11 @@ async def confirm_restart(_, query):
             qb.cancel()
         if jd := intervals["jd"]:
             jd.cancel()
-        if nzb := intervals["nzb"]:
-            nzb.cancel()
         if st := intervals["status"]:
             for intvl in list(st.values()):
                 intvl.cancel()
         await clean_all()
         await TorrentManager.close_all()
-        if sabnzbd_client.LOGGED_IN:
-            await gather(
-                sabnzbd_client.pause_all(),
-                sabnzbd_client.delete_job("all", True),
-                sabnzbd_client.purge_all(True),
-                sabnzbd_client.delete_history("all", delete_files=True),
-            )
-            await sabnzbd_client.close()
         if jdownloader.is_connected:
             await gather(
                 jdownloader.device.downloadcontroller.stop_downloads(),
