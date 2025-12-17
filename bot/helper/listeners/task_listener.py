@@ -134,7 +134,7 @@ class TaskListener(TaskConfig):
             gid = download.gid()
         LOGGER.info(f"Download completed: {self.name}")
 
-        if not (self.is_torrent or self.is_qbit):
+        if not self.is_torrent:
             self.seed = False
 
         if multi_links:

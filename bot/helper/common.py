@@ -84,8 +84,6 @@ class TaskConfig:
         self.subsize = 0
         self.proceed_count = 0
         self.is_leech = False
-        self.is_qbit = False
-        self.is_nzb = False
         self.is_jd = False
         self.is_clone = False
         self.is_ytdlp = False
@@ -578,10 +576,8 @@ class TaskConfig:
         await obj(
             self.client,
             nextmsg,
-            self.is_qbit,
             self.is_leech,
             self.is_jd,
-            self.is_nzb,
             self.same_dir,
             self.bulk,
             self.multi_tag,
@@ -617,10 +613,8 @@ class TaskConfig:
             await obj(
                 self.client,
                 nextmsg,
-                self.is_qbit,
                 self.is_leech,
                 self.is_jd,
-                self.is_nzb,
                 self.same_dir,
                 self.bulk,
                 self.multi_tag,

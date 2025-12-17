@@ -91,8 +91,6 @@ async def confirm_restart(_, query):
         await TgClient.stop()
         if scheduler.running:
             scheduler.shutdown(wait=False)
-        if qb := intervals["qb"]:
-            qb.cancel()
         if jd := intervals["jd"]:
             jd.cancel()
         if st := intervals["status"]:
@@ -115,7 +113,7 @@ async def confirm_restart(_, query):
             "pkill",
             "-9",
             "-f",
-            "gunicorn|aria2c|qbittorrent-nox|ffmpeg|rclone|java|sabnzbdplus|7z|split",
+            "gunicorn|aria2c|ffmpeg|rclone|java|7z|split",
         )
         proc2 = await create_subprocess_exec("python3", "update.py")
         await gather(proc1.wait(), proc2.wait())

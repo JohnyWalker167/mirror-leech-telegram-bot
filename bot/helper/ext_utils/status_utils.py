@@ -212,7 +212,6 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             if (
                 tstatus == MirrorStatus.STATUS_DOWNLOAD
                 and task.listener.is_torrent
-                or task.listener.is_qbit
             ):
                 try:
                     msg += f"\n<b>Seeders:</b> {task.seeders_num()} | <b>Leechers:</b> {task.leechers_num()}"
